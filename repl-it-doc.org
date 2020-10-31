@@ -82,54 +82,55 @@
    sia per poter utilizzare il sistema di controllo di revisione (vedi
    oltre).
 
-* L'interprete interattivo
+* Python
+** L'interprete interattivo
 
-  Python è un linguaggio *interpretato*, il che vuol dire che il codice
-  sorgente viene eseguito "così com'è" direttamente da un programma
-  chiamato *interprete* invece di essere tradotto, da un programma
-  chiamato di solito *compilatore* in un altro linguaggio comprensibile
-  (ed eseguibile) da "un altro esecutore" (ad esempio "la CPU").
+   Python è un linguaggio *interpretato*, il che vuol dire che il codice
+   sorgente viene eseguito "così com'è" direttamente da un programma
+   chiamato *interprete* invece di essere tradotto, da un programma
+   chiamato di solito *compilatore* in un altro linguaggio comprensibile
+   (ed eseguibile) da "un altro esecutore" (ad esempio "la CPU").
 
-  Python, come succede spesso ma non sempre con i linguaggi
-  interpretati, è anche un linguaggio *interattivo,* il che significa
-  che è possibile "direttamente" scrivendo singole linee di codice che
-  vengono eseguite "subito" e il cui risultato (se c'è) viene anche
-  visualizzato (stampato) subito, *senza bisogno di usare la funzione
-  print*!
+   Python, come succede spesso ma non sempre con i linguaggi
+   interpretati, è anche un linguaggio *interattivo,* il che significa
+   che è possibile "direttamente" scrivendo singole linee di codice
+   che vengono eseguite "subito" e il cui risultato (se c'è) viene
+   anche visualizzato (stampato) subito, *senza bisogno di usare la
+   funzione print*!
 
-  Questa modalità non è comoda per scrivere programmi di una certa
-  lunghezza, ma è comodissima, tra le altre cose, per fare un po' di
-  pratica con i concetti, i tipi di dato e le funzionalità di base del
-  linguaggio.
+   Questa modalità non è comoda per scrivere programmi di una certa
+   lunghezza, ma è comodissima, tra le altre cose, per fare un po' di
+   pratica con i concetti, i tipi di dato e le funzionalità di base
+   del linguaggio.
 
-** Pratica
+*** Pratica
 
-   Vediamo quindi di fare un po' di pratica.
+    Vediamo quindi di fare un po' di pratica.
 
-*** Espressioni semplici
+**** Espressioni semplici
 
-    1. se scrivo 123 (e poi invio) l'interprete stampa 123, la ragione
-       è che 123 è una *espressione* (anche se banale visto che è un
-       literal), l'interprete la *valuta*, ottiene un *valore* a cui
-       probabilmente siamo interessati e quindi lo stampa (senza dover
-       usare print).
+     1. se scrivo 123 (e poi invio) l'interprete stampa 123, la
+        ragione è che 123 è una *espressione* (anche se banale visto che
+        è un literal), l'interprete la *valuta*, ottiene un *valore* a cui
+        probabilmente siamo interessati e quindi lo stampa (senza
+        dover usare print).
 
-    2. se scrivo =a = 123=, l'interprete non stampa nulla, perché in
-       Python le assegnazioni non sono espressioni, non hanno un
-       valore e quini c'è poco da stampare!
+     2. se scrivo =a = 123=, l'interprete non stampa nulla, perché in
+        Python le assegnazioni non sono espressioni, non hanno un
+        valore e quini c'è poco da stampare!
 
-    3. se però adesso scrivo =a=, l'interprete stampa 123, perché =a=
-       (così da solo) è una espressione (un po' meno banale di un
-       /literal/), quindi viene valutata, si ottiene un valore che viene
-       stampato.
+     3. se però adesso scrivo =a=, l'interprete stampa 123, perché =a=
+        (così da solo) è una espressione (un po' meno banale di un
+        /literal/), quindi viene valutata, si ottiene un valore che
+        viene stampato.
 
-*** Tipi di dato
+**** Tipi di dato
 
-    Abbiamo già parlato di tipi di dato (/data types/) in generale e del
-    fatto che anche in Python un dato è sempre di un certo tipo, che
-    posso ottenere con la "funzione" =type=. Vediamo cosa ottengo se uso
-    =type= passando un /literal/, un nome o una espressione.
-#+BEGIN_SRC python :eval never
+     Abbiamo già parlato di tipi di dato (/data types/) in generale e
+     del fatto che anche in Python un dato è sempre di un certo tipo,
+     che posso ottenere con la "funzione" =type=. Vediamo cosa ottengo
+     se uso =type= passando un /literal/, un nome o una espressione.
+ #+BEGIN_SRC python :eval never
 >>> type(123)
 <class 'int'>
 >>> a = 123
@@ -137,29 +138,30 @@
 <class 'int'>
 >>> type(100 + 23)
 <class 'int'>
-#+END_SRC
+ #+END_SRC
 
-   Ottengo sempre lo stesso risultato, che indica che il tipo è =int=.
-   Fate però attenzione: ciò non significa che il nome =a= è di tipo =int=
-   o che l'espressione =123 + 543= è di tipo =int=; in tutti e tre i casi,
-   come sempre, il *parametro attuale* che io passo ad una funzione
-   viene prima di tutto valutato e poi *passato* alla funzione.  Ciò
-   implica che in tutti e tre i casi, alla funzione =type= attiva un
-   =123=, che è di tipo =int=!
+    Ottengo sempre lo stesso risultato, che indica che il tipo è =int=.
+    Fate però attenzione: ciò non significa che il nome =a= è di tipo
+    =int= o che l'espressione =123 + 543= è di tipo =int=; in tutti e tre i
+    casi, come sempre, il *parametro attuale* che io passo ad una
+    funzione viene prima di tutto valutato e poi *passato* alla
+    funzione.  Ciò implica che in tutti e tre i casi, alla funzione
+    =type= attiva un =123=, che è di tipo =int=!
 
-   *Esercizio*: provate ad usare =type= con altri tipi di dato che
-   conoscete.
+    *Esercizio*: provate ad usare =type= con altri tipi di dato che
+    conoscete.
 
-*** Help
+**** Help
 
-    Un'altra funzionalità da sfruttare nella modalità interattiva è la
-    funzione =help=, che dà accesso alla documentazione /on-line/. Notare:
-    l'informazione fornita da =help= è "interna" agli oggetti di cui
-    chiedete la documentazione stessa ed è quindi sempre disponibile
-    (non viene cercata su un qualche file esterno o in rete!).
+     Un'altra funzionalità da sfruttare nella modalità interattiva è
+     la funzione =help=, che dà accesso alla documentazione
+     /on-line/. Notare: l'informazione fornita da =help= è "interna" agli
+     oggetti di cui chiedete la documentazione stessa ed è quindi
+     sempre disponibile (non viene cercata su un qualche file esterno
+     o in rete!).
 
-    Vediamo un esempio con =help(print)=:
-#+BEGIN_SRC python :eval never
+     Vediamo un esempio con =help(print)=:
+ #+BEGIN_SRC python :eval never
 >>> help(print)
 Help on built-in function print in module builtins:
 
@@ -172,37 +174,37 @@ print(...)
     sep:   string inserted between values, default a space.
     end:   string appended after the last value, default a newline.
     flush: whether to forcibly flush the stream.
-#+END_SRC
+ #+END_SRC
 
-    Breve spiegazione:
+     Breve spiegazione:
 
-    1. la prima riga ci dice che =print= è una funzione (/function/), in
-       particolare è una funzione /built-in/ (ossia "già presente"
-       nell'interprete) e che è definita nel modulo =builtins= (vedremo
-       poi cosa sono i moduli).
+     1. la prima riga ci dice che =print= è una funzione (/function/), in
+        particolare è una funzione /built-in/ (ossia "già presente"
+        nell'interprete) e che è definita nel modulo =builtins= (vedremo
+        poi cosa sono i moduli).
 
-    2. la riga successiva mostra la /signature/ della funzione, in
-       pratica (potete pensare che sia) ciò che c'è scritto dopo =def=
-       nella definizione di una funzione qualsiasi.
+     2. la riga successiva mostra la /signature/ della funzione, in
+        pratica (potete pensare che sia) ciò che c'è scritto dopo =def=
+        nella definizione di una funzione qualsiasi.
 
-    3. =value= indica è il dato che vogliamo stampare,
+     3. =value= indica è il dato che vogliamo stampare,
 
-    4. i tre puntini indicano che è possibile passare altri argomenti
-       oltre al primo,
+     4. i tre puntini indicano che è possibile passare altri argomenti
+        oltre al primo,
 
-    5. =sep=, =end=, =file= e =flush= rappresentano degli argomenti opzionali
-       (che vedremo nelle prossime lezioni...), e il valore dopo il
-       segno di uguale indica il valore per difetto (/default value/)
-       ossia il valore usato se non ne forniamo uno esplicitamente,
+     5. =sep=, =end=, =file= e =flush= rappresentano degli argomenti opzionali
+        (che vedremo nelle prossime lezioni...), e il valore dopo il
+        segno di uguale indica il valore per difetto (/default value/)
+        ossia il valore usato se non ne forniamo uno esplicitamente,
 
-    6. le righe successive danno informazioni di dettaglio sui vari
-       argomenti.
+     6. le righe successive danno informazioni di dettaglio sui vari
+        argomenti.
 
-    *Nota importante*: quando definiamo delle funzioni, possiamo
-    fornire la documentazione in una /docstring/, ossia in una stringa
-    posta subito dopo la riga =def=.  Un esempio vale mille parole:
+     *Nota importante*: quando definiamo delle funzioni, possiamo
+     fornire la documentazione in una /docstring/, ossia in una stringa
+     posta subito dopo la riga =def=.  Un esempio vale mille parole:
 
-#+BEGIN_SRC python :eval never
+ #+BEGIN_SRC python :eval never
 >>> def hello(who):
 ...     "Say hello to WHO"
 ...     print("Hello " + who)
@@ -214,24 +216,24 @@ Help on function hello in module __main__:
 
 hello(who)
     Say hello to WHO
-#+END_SRC
+ #+END_SRC
 
-*** Completion (completamento?)
+**** Completion (completamento?)
 
-    Un'altra funzionalità molto utile è il completamento automatico.
-    Molti "strumenti di sviluppo" forniscono un qualche meccanismo che
-    "scrive per voi" o che almeno suggerisce cosa potreste scrivere.
-    Uno molto utile è il completamento, in particolare il
-    completamento delle "proprietà" (attributi, metodi etc.).
+     Un'altra funzionalità molto utile è il completamento automatico.
+     Molti "strumenti di sviluppo" forniscono un qualche meccanismo che
+     "scrive per voi" o che almeno suggerisce cosa potreste scrivere.
+     Uno molto utile è il completamento, in particolare il
+     completamento delle "proprietà" (attributi, metodi etc.).
 
-    Per esempio: se io ho una stringa e non sono bene "cosa posso
-    farci", posso cercare tra i *metodi* (parenti delle funzioni)
-    disponibili e per fare ciò mi basta scrivere un nome (purtroppo
-    non funziona con i /literal/) e usare il tasto =TAB=.
+     Per esempio: se io ho una stringa e non sono bene "cosa posso
+     farci", posso cercare tra i *metodi* (parenti delle funzioni)
+     disponibili e per fare ciò mi basta scrivere un nome (purtroppo
+     non funziona con i /literal/) e usare il tasto =TAB=.
 
-    Esempio (in cui ho tolto alcune righe... e in cui nella seconda
-    riga, dopo =name.= ho premuto il tasto =TAB=).
-#+BEGIN_SRC python :eval never
+     Esempio (in cui ho tolto alcune righe... e in cui nella seconda
+     riga, dopo =name.= ho premuto il tasto =TAB=).
+ #+BEGIN_SRC python :eval never
 >>> name = "Luca"
 >>> name.
 name.capitalize(    name.isalpha(       name.ljust(         name.split(
@@ -248,39 +250,7 @@ lower() method of builtins.str instance
 
 >>> name.lower()
 'luca'
-#+END_SRC
-
-* Codice "da file"
-
-  Vediamo adesso anche un esempio in cui scriviamo del codice in un
-  file e poi lo eseguiamo.
-
-  1. usiamo il file =main.py= già creato da =repl=,
-
-  2. inseriamo una funzione =sum_pos= che dato un "insieme di numeri"
-     *calcola e restituisce* la somma dei soli positivi.
-#+BEGIN_SRC python :session py :results silent
-def sum_pos(ints):
-    "The sum of the elements in INTS"
-    t = 0              # creo un "accumulatore" nullo
-    for i in ints:     # ciclo su tutti gli elementi di INTS
-        if i > 0:      # e solamente se quello corrente è positivo
-            t += i     # lo sommo all'accumulatore
-    return t           # restituisco il risultato
-#+END_SRC
-
-  3. per fare un primo controllo proviamo ad usare la funzione in un
-     paio di esempi,
-
-#+NAME: sum-pos-test-0
-#+BEGIN_SRC python :session py :results output :exports both
-ii = (2,3,4,0-12)
-t = sum_pos(ii)
-print(ii, "->", t)
-#+END_SRC
-
-#+RESULTS: sum-pos-test-0
-: (2, 3, 4, -12) -> 9
+ #+END_SRC
 
 ** Qualche "trucco" comodo
 
@@ -316,6 +286,37 @@ for ii in data:
 : (0, -5, 7) -> 7
 : (-1, 0, 2) -> 2
 
+** Codice "da file"
+
+   Vediamo adesso anche un esempio in cui scriviamo del codice in un
+   file e poi lo eseguiamo.
+
+   1. usiamo il file =main.py= già creato da =repl=,
+
+   2. inseriamo una funzione =sum_pos= che dato un "insieme di numeri"
+      *calcola e restituisce* la somma dei soli positivi.
+ #+BEGIN_SRC python :session py :results silent
+def sum_pos(ints):
+    "The sum of the elements in INTS"
+    t = 0              # creo un "accumulatore" nullo
+    for i in ints:     # ciclo su tutti gli elementi di INTS
+        if i > 0:      # e solamente se quello corrente è positivo
+            t += i     # lo sommo all'accumulatore
+    return t           # restituisco il risultato
+ #+END_SRC
+
+   3. per fare un primo controllo proviamo ad usare la funzione in un
+      paio di esempi,
+
+ #+NAME: sum-pos-test-0
+ #+BEGIN_SRC python :session py :results output :exports both
+ii = (2,3,4,0-12)
+t = sum_pos(ii)
+print(ii, "->", t)
+ #+END_SRC
+
+ #+RESULTS: sum-pos-test-0
+ : (2, 3, 4, -12) -> 9
 
 * Local Variables                                                  :noexport:
 
