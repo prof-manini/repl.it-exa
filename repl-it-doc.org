@@ -450,7 +450,8 @@ drop table if exists Person;
 create table Person (              -- nomi delle tabelle "capitalized"
     id integer primary key,        -- vincolo di PK
     name varchar[25] not null,     -- vincolo di unicità (sulla singola colonna)
-    code char[5] not null unique   -- ultima riga SENZA virgola!
+    code char[5] not null unique,
+    age integer not null           -- ultima riga SENZA virgola!
 );
 #+end_src
 
@@ -498,11 +499,11 @@ sqlite> .tables
 #+header: :db exa.db
 #+begin_src sqlite :results silent
 insert into Person     -- nome della tabella
-(name, code)           -- nomi delle colonne
+(name, code, age)           -- nomi delle colonne
 values
-('Linus', '123-L'),    -- valori, nelleo stesso ordine
-('Richard', '444-R'),  -- in cui sono state specificate
-('Bob', '666-B');      -- le colonne!
+('Linus', '123-L', 51),    -- valori, nelleo stesso ordine
+('Richard', '444-R', 67),  -- in cui sono state specificate
+('Bob', '666-B', 63);      -- le colonne!
 #+end_src
 
 *** Estrazione dei dati
@@ -526,12 +527,12 @@ values
 select * from Person;
 #+end_src
 
-    E questo è un tipico risultato (il sepratore di colonne dipende da
+    E questo è un tipico risultato (il separatore di colonne dipende da
     molti fattori, ma la virgola è abbastanza normale).
 #+RESULTS: select-asterisk
-: 1,Linus,123-L
-: 2,Richard,444-R
-: 3,Bob,666-B
+: 1,Linus,123-L,51
+: 2,Richard,444-R,67
+: 3,Bob,666-B,63
 
     In realtà, la "select con asterisco" è da evitare per vari motivi,
     primo tra tutti il fatto che si può sapere in anticipo quante
