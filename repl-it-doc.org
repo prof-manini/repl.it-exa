@@ -555,6 +555,25 @@ select code, name from Person;
 : 444-R,Richard
 : 666-B,Bob
 
+*** Descrittori di colonna
+
+    Il motivo per cui è più corretto parlare di "descrittori" di
+    colonna, è che i dati contenuti nelle colonne del "risultato" di
+    una =select= sono sempre solo quelli contenuti nelle colonne delle
+    tabelle a cui la =select= fa riferimento. Un esempio per tutti:
+#+name: select-with-dumb-column
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results output :exports both
+select code, 'Hello World!', 123 * 2 from Person;
+#+end_src
+
+    che da il seguente risultato!
+#+RESULTS: select-with-dumb-column
+: 123-L,"Hello World!",246
+: 444-R,"Hello World!",246
+: 666-B,"Hello World!",246
+
 *** Funzionalità "non SQL" di SQLite
 
     La =select= appena vista è corretta, ma c'è un "piccolo problema":
