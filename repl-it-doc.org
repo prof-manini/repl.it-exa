@@ -14,7 +14,8 @@
 (setq org-babel-load-languages
         '((emacs-lisp . t)
           (python . t)
-          (sh . t)))
+          (sh . t)
+          (sqlite . t)))
 (setq python-shell-interpreter "python3")
 #+END_SRC
 
@@ -317,6 +318,277 @@ print(ii, "->", t)
 
  #+RESULTS: sum-pos-test-0
  : (2, 3, 4, -12) -> 9
+
+* SQL
+
+  Oltre che per la programmazione in un linguaggio "generico" (/general
+  purpose/) come Python, useremo repl.it anche per imparare e fare
+  pratica con SQL, un linguaggio orientato ai database.
+
+  Il linguaggio SQL nasce negli anni settanta, ed è quindi uno dei
+  linguaggio più vecchi tra quelli ancora in uso.  In tutti questi
+  anni è ovviamente cambiato moltissimo, ne sono nate molte versioni
+  (dialetti) e nonostante gli sforzi di standardizzazione ancora
+  adesso è meglio essere pronti a trovare differenze anche
+  significative tra le varie implementazioni.
+
+  Anche l'SQL, come Python, si può considerare, almeno per l'uso che
+  ne faremo noi, un linguaggio "interpretato e interattivo"; ciò fa sì
+  che si presti ad essere utilizzato in un ambiente come quello
+  fornito da repl.it.
+
+** SQLite
+
+   Come sapete, i [[https://en.wikipedia.org/wiki/Database][database]] sono dei "contenitori di dati strutturati",
+   che servono da "base" per multiple applicazioni, e che sono
+   generalmente "gestiti" da software molto complessi chiamati DBMS
+   ([[https://en.wikipedia.org/wiki/Database#Database_management_system][database management systems]]) che funzionano tipicamente in
+   modalità /client server/ (con il DBMS che gira su un computer e le
+   "applicazioni" che girano su altre macchine).  Esempi di database
+   di questo tipo sono [[https://en.wikipedia.org/wiki/PostgreSQL][Postgres]] o [[https://en.wikipedia.org/wiki/Oracle_Database][Oracle]].
+
+   Noi però useremo [[https://en.wikipedia.org/wiki/SQLite][SQLite]], un sistema molto più semplice e "leggero"
+   che ha vari vantaggi:
+
+   1. accettare un SQL relativamente completo e "standard",
+   2. viene usato spesso /embedded/ in altre applicazioni (ad esempio
+      per l'agenda dei telefoni Android o per le "preference" di vari
+      browser),
+   3. è molto comodo da usare anche da Python.
+
+   XXX vi consiglio di scaricarvi in locale la [[https://sqlite.org/2020/sqlite-doc-3330000.zip][documentazione di
+   riferimento]].
+
+** Esempio
+
+   In questo semplice esempio vedremo come usare le funzionalità di
+   base dell'SQL per creare una tabella ed inserire ed "estrarre"
+   alcuni dati.  Questa è la sequenza tipica di qualsiasi "esempio",
+   grande o piccolo che sia. Vedremo poi alcuni "comandi" di SQLite
+   che non fanno parte del linguaggio SQL ma che sono molto utili
+   nell'interazione con l'interprete.
+
+*** Creazione del database
+
+    Nella maggioranza dei DBMS, la prima operazione da fare è creare
+    un database, nel senso di creare il file (o più spesso l'insieme
+    di file) su cui vengono "salvati" (in termine tecnico "resi
+    persistenti") i dati.
+
+    Siccome SQLite è pensato per operare fondamentalmente in memoria
+    questa operazione non è in linea di principio necessaria; esiste
+    comunque un comando (non SQL) per salvare i dati in un file (con
+    "db" come estensione di /default/) e un altro comando per
+    "ricaricarlo".
+
+    In pratica SQLite crea automaticamente un database in memoria di
+    nome =main:= ed è per questo che anche usando =repl.it= non avremo
+    bisogno di preoccuparci di questo aspetto.
+
+*** Creazione tabella
+
+    La prima cosa che viene in mente di fare è giustamente creare una
+    tabella, ma quando si stanno facendo degli esempi è normale
+    "rieseguire" ogni volta tutto il codice, ma cercare di creare una
+    tabella se questa esiste già è un errore.  La soluzione che si usa
+    normalmente è cancellare la tabella (con l'istruzione SQL =drop
+    table=) per poi ricrearla.  Peccato che anche cancellare una
+    tabella che non esiste è un errore!  Fortunatamente, in molti SQL
+    si può usare il seguente codice, che credo non richieda
+    spiegazioni.
+
+    *Nota*: le istruzioni SQL *devono* essere terminate con un punto e
+    virgola (/semicolon/)!
+
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results silent
+drop table if exists Person;
+#+end_src
+
+    Per creare la tabella si usa l'istruzione =create table=, che come
+    si può immaginare richiede di specificare il nome della tabella e
+    la lista delle colonne.
+
+    *Nota:* come già detto l'SQL è un linguaggio molto "variabile",
+    quindi quasi tutte le affermazioni sulla sua sintassi vanno prese
+    un po' con le pinze.  In ogni caso, l'SQL è *fondamentalmente non*
+    /case sentitive/, quindi *in genere* "non distingue maiuscole e
+    minuscole".  È però assolutamente vitale essere coerenti e non
+    sfruttare questo fatto.  Se decidete, come faccio io, di scrivere
+    quasi tutto minuscolo, fatelo sempre!
+
+    Qui creo una tabella =Person= con tre colonne =id=, =name= e
+    =code=. La colonna =id= serve da chiave primaria.
+
+    Per una lista dei tipi di dato gestiti da SQLite basta consultare
+    la documentazione [[https://www.sqlite.org/datatype3.html][on-line]].
+
+    *Nota:* nella sua semplicità, SQLite ha in realtà pochi tipi di dato
+    "nativi" (TEXT, NUMERIC, INTEGER, REAL, BLOB) che vengono poi
+    utilizzati "al posto" di quelli più normali per l'SQL (come =CHAR= o
+    =VARCHAR=).
+
+    *Nota:* la chiave primaria è spesso un intero senza particolare
+    "significato" (per dire, non è come il "codice fiscale" o la
+    coppia "nome/cognome") e l'unica caratteristica importante è che
+    deve essere *sempre presente* (vincolo =not null= in SQL) e *deve
+    avere un valore* in ogni riga ( vincolo =unique= in SQL).  Quando si
+    inseriscono delle righe è quindi obbligatorio specificare un
+    valore, e con il vincolo di unicità la cosa diventa una
+    scocciatura!  Tutti (?) i database forniscono dei meccanismi per
+    generare questi valori in modo automatico, spesso semplicemente
+    specificando un attributo =autoincrement=.  SQLite ha un meccanismo
+    diverso; *in pratica*, se si dichiara una colonna =integer primary
+    key=, il suo valore, se non specificato nelle =insert= viene gestito
+    automaticamente dal sistema (il come non ci interessa).
+
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results silent
+-- Esempio di creazione di una tabella (questo è un commento!)
+create table Person (              -- nomi delle tabelle "capitalized"
+    id integer primary key,        -- vincolo di PK
+    name varchar[25] not null,     -- vincolo di unicità (sulla singola colonna)
+    code char[5] not null unique   -- ultima riga SENZA virgola!
+);
+#+end_src
+
+**** Giusto per farsi un'idea
+
+     Una piccola parentesi (che potete saltare) giusto per mostrare
+     quanto sia "strano" l'SQL in quanto alla questione /case/.
+
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results silent :eval never
+sqlite> create table "foo" (id integer);
+sqlite> drop TABLE foo;
+sqlite> create table table (id integer);
+Error: near "table": syntax error
+sqlite> create table "TABLE" (id integer);
+sqlite> drop table Table;
+Error: near "Table": syntax error
+sqlite> drop table "Table";
+sqlite> .tables
+#+end_src
+
+*** Inserimento dati
+
+    Per "popolare" una tabella, ossia per inserire dati, ossia per
+    aggiungere righe, si usa il comando =insert into= che richiede il
+    nome della tabella, la lista delle colonne in cui si vogliono
+    inserire (tra parentesi separati da virgole) seguita dai dati (una
+    lista di valori tra parentesi per ciascuna riga).
+
+    *Nota:* la lista dei nomi delle colonne è *opzionale* nel qual caso si
+    devono specificare dei valori per *tutte* le colonne (una
+    scocciatura) e *esattamente nell'ordine* in cui sono state definite
+    (ordine che di solito non si conosce!). Quindi in pratica: *non è
+    opzionale*!
+
+    *Nota:* in SQL il *delimitatore* per le stringhe è l'*apice singolo* e
+    non le *virgolette* (o apice doppio).  Le virgolette servono per
+    *quotare* i nomi degli identificatori quando si ci vuole complicare
+    la vita!  Il fatto che quasi tutti i database (incluso SQLite) "si
+    bevano" anche le virgolette non è un buon motivo per derogare (e
+    il fatto di aver programmato in =C= per una vita nemmeno!).
+
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results silent
+insert into Person     -- nome della tabella
+(name, code)           -- nomi delle colonne
+values
+('Linus', '123-L'),    -- valori, nelleo stesso ordine
+('Richard', '444-R'),  -- in cui sono state specificate
+('Bob', '666-B');      -- le colonne!
+#+end_src
+
+*** Estrazione dei dati
+
+    Con la =insert= abbiamo *scritto* dei nel database, adesso vediamo
+    come, usando l'istruzione =select=, si possono *leggere*.
+
+    *Nota*: come sinonimo di "leggere" si usa spesso il termine
+    "estrarre" che però può generare confusione perché da l'idea che i
+    dati vengono "tolti" dal database, cosa che non avviene.
+
+    Per vedere il contenuto di una tabella si usa spesso questa
+    espressione, che in pratica chiede di vedere il contenuto di tutte
+    le colonne (l'asterisco) e di tutte le righe (perché questo è il
+    comportamento normale in assenza di *filtri*).
+
+#+name: select-asterisk
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results output :exports both
+select * from Person;
+#+end_src
+
+    E questo è un tipico risultato (il sepratore di colonne dipende da
+    molti fattori, ma la virgola è abbastanza normale).
+#+RESULTS: select-asterisk
+: 1,Linus,123-L
+: 2,Richard,444-R
+: 3,Bob,666-B
+
+    In realtà, la "select con asterisco" è da evitare per vari motivi,
+    primo tra tutti il fatto che si può sapere in anticipo quante
+    saranno le colonne e quali "nomi" avranno.  Ricordarsi che le
+    tabelle di una tabella possono cambiare nel tempo!  È quindi molto
+    più corretto esplicitare sempre la lista delle colonne.
+
+    *Nota*: per i "nomi" che seguono la /keyword/ =select= si usa spesso il
+    termine di "colonna", ma il termine corretto è *descrittore di
+    colonna*, per motivi che saranno chiari più avanti.
+#+name: select-with-names
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results output :exports both
+select code, name from Person;
+#+end_src
+
+#+RESULTS: select-with-names
+: 123-L,Linus
+: 444-R,Richard
+: 666-B,Bob
+
+*** Funzionalità "non SQL" di SQLite
+
+    La =select= appena vista è corretta, ma c'è un "piccolo problema":
+    l'output non include i nomi (intestazioni) delle colonne.  È
+    giusto così, perché non fanno parte del contenuto della tabella,
+    sono dei *metadati*, ma ciò non toglie che sarebbe utile poterli
+    includere nel risultato, almeno quando lo si vuol "visualizzare".
+
+    Per fare questo si possono usare dei *comandi* che non fanno parte
+    del linguaggio, ma che sono specifici dell'*interprete* SQLite.
+#+name: select-fancy
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results output :exports both
+.header on
+.separator |
+.mode column
+.width 3 5 8
+select id, code, name from Person;
+#+end_src
+
+    E il risultato, molto più "bellino" del precedente, è:
+#+RESULTS: select-fancy
+: id   code   name
+: ---  -----  --------
+: 1    123-L  Linus
+: 2    444-R  Richard
+: 3    666-B  Bob
+
+    I significato dei quattro comandi è il seguente:
+
+    - header :: indica se mostrare (on) o no (off) le intestazioni,
+    - separator ::  mi pare chiaro!
+    - mode ::  indica il tipo di "formattazione" (html, csv, etc.)
+    - width ::  la larghezza delle varie colonne.
 
 * Local Variables                                                  :noexport:
 
