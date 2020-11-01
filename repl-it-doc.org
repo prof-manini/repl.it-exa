@@ -610,6 +610,69 @@ select id, code, name from Person;
     - mode ::  indica il tipo di "formattazione" (html, csv, etc.)
     - width ::  la larghezza delle varie colonne.
 
+*** Selezione di righe (WHERE)
+
+    Abbiamo visto che in una =select= si possono "selezionare alcune
+    colonne", se invece vogliamo selezionare delle righe, limitando
+    così l'insieme delle righe su cui operiamo, dobbiamo usare la
+    *clausola* =where=.
+
+#+name: select-where-0
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results output :exports both
+select name, code
+from Person
+where age > 60;
+#+end_src
+
+#+RESULTS: select-where-0
+: Richard,444-R
+: Bob,666-B
+
+    che come si vede "produce" solo due righe, quelle in cui la
+    colonna =age= contiene un valore maggiore di 60.  La clausola =where=
+    deve essere sempre seguita, come nell'esempio, da una *espressione
+    logica* e seleziona solo le righe per cui l'espressione, il cui
+    valore tipicamente dipende dal contenuto delle righe, è "vero".
+
+    *Nota*: la clausola =where= non è legata alle =select= ma, come vedremo,
+    può essere utilizzata anche in altre operazioni come
+    l'aggiornamento o la cancellazione di dati e anche per "collegare"
+    più tabelle.
+
+    L'uso della =where= è semplice e direi intuitivo; nella pratica poi
+    le difficoltà nascono dalla complessità dell'espressione logica
+    che spesso coinvolge multipli operatori su multiple colonne.
+
+    Un esempio appena più complicato:
+#+name: select-where-1
+#+header: :dir ./
+#+header: :db exa.db
+#+begin_src sqlite :results output :exports both
+.header on
+.separator |
+.mode column
+select name, code, age
+from Person
+where age > 60 and name = 'Bob';
+#+end_src
+
+    che genera una sola riga perché ho aggiunto, con l'operatore =and=
+    una seconda condizione che ha reso la condizione complessiva più
+    "stringente".
+
+#+RESULTS: select-where-1
+: name        code        age
+: ----------  ----------  ----------
+: Bob         666-B       63
+
+    *Nota*: è in generale buona norma, sopratutto quando il risultato è
+    pensato per essere "letto" includere nella lista delle colonne
+    della =select= anche le colonne utilizzate nei vari "filtri",
+    altrimenti si fa fatica a capire perché alcune righe sono presenti
+    e altre no!.
+
 * Local Variables                                                  :noexport:
 
 # Local Variables:
