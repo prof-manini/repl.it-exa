@@ -542,7 +542,7 @@ select * from Person;
 
     *Nota*: per i "nomi" che seguono la /keyword/ =select= si usa spesso il
     termine di "colonna", ma il termine corretto è *descrittore di
-    colonna*, per motivi che saranno chiari più avanti.
+    colonna*, per motivi che chiarirò tra poco.
 #+name: select-with-names
 #+header: :dir ./
 #+header: :db exa.db
