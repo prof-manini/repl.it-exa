@@ -454,10 +454,10 @@ create table Person (              -- nomi delle tabelle "capitalized"
 );
 #+end_src
 
-**** Giusto per farsi un'idea
+*** Giusto per farsi un'idea
 
-     Una piccola parentesi (che potete saltare) giusto per mostrare
-     quanto sia "strano" l'SQL in quanto alla questione /case/.
+    Una piccola parentesi (che potete saltare) giusto per mostrare
+    quanto sia "strano" l'SQL in quanto alla questione /case/.
 
 #+header: :dir ./
 #+header: :db exa.db
