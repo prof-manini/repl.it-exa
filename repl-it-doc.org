@@ -673,6 +673,170 @@ where age > 60 and name = 'Bob';
     altrimenti si fa fatica a capire perché alcune righe sono presenti
     e altre no!.
 
+*** Due tabelle (o una sola?)
+
+    Vediamo adesso un esempio in cui sono "necessarie" due tabelle:
+    l'agenda telefonica.  Abbiamo una lista di persone (nomi) e una
+    lista di numeri telefonici, con l'ipotesi di base che una persona
+    può avere più numeri di telefono ma non il viceversa, quindi
+    ciascun numero di telefono è associato ad una sola persona.
+
+    *Nota:* lasciamo per ora l'interessante da parte il caso di persone
+    senza numeri di telefono e telefoni senza "padrone".
+
+**** Tabella singola
+
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results silent
+drop table if exists Agenda;
+create table Agenda (
+    name varchar[25] not null,
+    phone varchar[20] not null unique
+);
+#+end_src
+
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results silent
+insert into Agenda (name, phone)
+values
+('Linus'   , '123-44-55-666'),
+('Linus'   , '123-44-00-888'),
+('Richard' , '300-00-11-22'),
+('Richard' , '300-00-33-00'),
+('Bob'     , '400-99-55-777');
+#+end_src
+
+#+name: agenda-0
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results output :exports both
+select name, phone from Agenda;
+#+end_src
+
+#+RESULTS: agenda-0
+: Linus,123-44-55-666
+: Linus,123-44-00-888
+: Richard,300-00-11-22
+: Richard,300-00-33-00
+: Bob,400-99-55-777
+
+    Gestire il dati in questo mode, dal punto di vista delle teoria
+    dei database relazionali, non è corretto, quantomeno perché ci
+    sono dei dati duplicati (i nomi).  Ci sono varie ragioni per cui
+    questo è un problema, ma al momento non ci interessano.  Ci
+    interessa però la "soluzione standard": dividere i dati in due
+    tabelle, una per i nomi e una per i numeri.
+
+**** Due tabelle
+
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results silent
+drop table if exists Person;
+create table Person (
+    id integer primary key,
+    name varchar[25] not null unique
+);
+
+drop table if exists Phone;
+create table Phone (
+    id integer primary key,
+    id_person integer references Person,
+    number varchar[20] not null unique
+);
+#+end_src
+
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results silent
+insert into Person (id, name) values
+(10, 'Linus'),
+(20, 'Richard'),
+(30, 'Bob');
+
+insert into Phone (id_person, number) values
+(10, '123-44-55-666'),
+(10, '123-44-00-888'),
+(20, '300-00-11-22'),
+(20, '300-00-33-00'),
+(30, 'Bob,400-99-55-777');
+#+end_src
+
+**** Collegamento (via where)
+
+#+name: phone-join-where
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results output :exports both
+select name, number
+from Person, Phone
+where Person.id = Phone.id_person;
+#+end_src
+
+#+RESULTS: phone-join-where
+: Linus,123-44-55-666
+: Linus,123-44-00-888
+: Richard,300-00-11-22
+: Richard,300-00-33-00
+: Bob,"Bob,400-99-55-777"
+
+**** Collegamento (via join)
+
+#+name: phone-join-join
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results output :exports both
+select name, number
+from Person, Phone
+where Person.id = Phone.id_person;
+#+end_src
+
+#+RESULTS: phone-join-join
+: Linus,123-44-55-666
+: Linus,123-44-00-888
+: Richard,300-00-11-22
+: Richard,300-00-33-00
+: Bob,"Bob,400-99-55-777"
+
+**** Collegamento (full join)
+
+#+name: phone-full-join
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results output :exports both
+select name, number
+from Person, Phone;
+#+end_src
+
+#+RESULTS: phone-full-join
+#+begin_example
+Linus,123-44-00-888
+Linus,123-44-55-666
+Linus,300-00-11-22
+Linus,300-00-33-00
+Linus,"Bob,400-99-55-777"
+Richard,123-44-00-888
+Richard,123-44-55-666
+Richard,300-00-11-22
+Richard,300-00-33-00
+Richard,"Bob,400-99-55-777"
+Bob,123-44-00-888
+Bob,123-44-55-666
+Bob,300-00-11-22
+Bob,300-00-33-00
+Bob,"Bob,400-99-55-777"
+#+end_example
+
+
+
+
+
+
+
+
+
 * Local Variables                                                  :noexport:
 
 # Local Variables:
