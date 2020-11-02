@@ -4,3 +4,5 @@
 *.out
 *.tex
 *.pdf
+*.db
+_minted-repl-it-doc/
