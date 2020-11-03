@@ -5,3 +5,4 @@
 *.tex
 *.db
 _minted-repl-it-doc/
+pdf/
