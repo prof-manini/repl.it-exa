@@ -686,6 +686,32 @@ where age > 60 and name = 'Bob';
 
 **** Tabella singola
 
+     Se uso una tabella singola, avrò una riga per ciascun numero di
+     telefono; ciascun numero di telefono comparirà in una sola riga
+     (non avrò numeri "ripetuti") da cui il vincolo =unique=, mentre
+     invece potrò avere più righe con lo stesso nome.  Sia il nome che
+     il numero dovranno essere presenti in tutte le righe, ossia non
+     potrò avere righe in cui il dato è assente (=NULL=) da cui il
+     vincolo =not null=.
+
+     *Nota*: i *vincoli* definiti nel database (su singole o più tabelle,
+     per singole colonne o per gruppi di colonne), vengono
+     "controllati", "fatti rispettare" (/enforced!/) dal database ogni
+     volta che si modifica il dato, quindi sia quando si aggiungono
+     righe sia quando si modificano.
+
+     *Nota*: in generale è importante scegliere nomi significativi (e
+     essere coerenti nel loro uso).  Per le tabelle dei database il
+     criterio per la scelta dei nomi è molto personale.  Una
+     possibilità è pensare alla tabella come contenitore ed usare il
+     termine usato "comunemente"; in questo caso il contenitore è
+     l'*agenda*. Una alternativa è invece pensare alle righe, in questo
+     caso "numeri di telefono" (abbreviato magari =tel_num= o =TelNum=),
+     usando quindi il *plurale*.  Poi però, nel codice SQL (come nelle
+     =where= degli esempi che vedremo nel seguito), quel nome viene
+     usato per indicare il valore di quella colonna in *una riga*, e
+     quindi sarebbe più naturale usare il *singolare*.
+
 #+header: :dir ./
 #+header: :db phone.db
 #+begin_src sqlite :results silent
@@ -695,6 +721,9 @@ create table Agenda (
     phone varchar[20] not null unique
 );
 #+end_src
+
+    L'inserimento dei dati non ha niente di particolare, specifico i
+    nomi delle colonne e non indico il valore per la chiave primaria.
 
 #+header: :dir ./
 #+header: :db phone.db
@@ -707,6 +736,9 @@ values
 ('Richard' , '300-00-33-00'),
 ('Bob'     , '400-99-55-777');
 #+end_src
+
+    Un controllo giusto per vedere che l'inserimento sia andato a buon
+    fine.
 
 #+name: agenda-0
 #+header: :dir ./
@@ -731,6 +763,10 @@ select name, phone from Agenda;
 
 **** Due tabelle
 
+     Separiamo quindi nomi (persone) e numeri (di telefono).  La
+     tabella =Person= (singolare!) non ha nulla di particolare, in
+     pratica è "un pezzo" di quella originale.
+
 #+header: :dir ./
 #+header: :db phone.db
 #+begin_src sqlite :results silent
@@ -739,68 +775,150 @@ create table Person (
     id integer primary key,
     name varchar[25] not null unique
 );
-
-drop table if exists Phone;
-create table Phone (
-    id integer primary key,
-    id_person integer references Person,
-    number varchar[20] not null unique
-);
 #+end_src
+
+     Anche in questo caso la =insert= non ha nulla di particolare, e non
+     mi sembra nemmeno necessario controllare, con una =select=, che
+     l'inserimento sia andato a buon fine.
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results silent
+insert into Person (name) values
+('Linus'),
+('Richard'),
+('Bob');
+#+end_src
+
+     Nella tabelle =Phone= devo invece aggiungere una colonna in più
+     (=id_person=) che serve per "collegare" ciascun numero di telefono
+     al relativo (unico!) nome.  Siccome le righe della tabella =Person=
+     sono identificate dalla colonna id (o più esplicitamente
+     =Person.id=), la colonna =id_person= conterrà valori "presi" da
+     quella colonna. La colonna =id_person= fa quindi "riferimento"
+     (/reference/) alla chiave primaria (colonna =id=) della tabella
+     =Person= e viene quindi chiamata "chiave esterna" (/foreign key/).
+     La /keyword/ =references= deve indicare in generale sia la tabella
+     che la colonna a cui si riferisce, ma se la colonna è la chiave
+     primaria è sufficiente (e secondo me preferibile) indicare solo
+     il nome della tabella.
 
 #+header: :dir ./
 #+header: :db phone.db
 #+begin_src sqlite :results silent
-insert into Person (id, name) values
-(10, 'Linus'),
-(20, 'Richard'),
-(30, 'Bob');
+drop table if exists Phone;
+create table Phone (
+    id integer primary key,              -- primary key
+    id_person integer references Person, -- foreign key
+    number varchar[20] not null unique
+);
+#+end_src
 
+     Adesso devo inserire i numeri di telefono, ma questa volta devo
+     anche inserire i valori della *chiave esterna*, che permettono di
+     indicare *indirettamente* a quale nome si riferiscono.
+
+     Per conoscere questi valori posso usare una =select=:
+#+name: people-select
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results output :exports both
+select id, name from Person;
+#+end_src
+
+     con questo risultato:
+#+RESULTS: people-select
+: 1,Linus
+: 2,Richard
+: 3,Bob
+
+     *Nota*: in questo esempio specifichiamo direttamente la chiave
+     esterna, di cui "guardiamo" il valore nell'altra tabella. In casi
+     più reali avremmo usato i nomi per fare "automaticamente"
+     l'estrazione dei valori delle chiavi primarie da =Person= e il loro
+     l'inserimento in =Phone= insieme ai numeri di telefono (cosa che
+     magari vedremo in seguito).
+#+header: :dir ./
+#+header: :db phone.db
+#+begin_src sqlite :results silent
 insert into Phone (id_person, number) values
-(10, '123-44-55-666'),
-(10, '123-44-00-888'),
-(20, '300-00-11-22'),
-(20, '300-00-33-00'),
-(30, 'Bob,400-99-55-777');
+(1, '123-44-55-666'),
+(1, '123-44-00-888'),
+(2, '300-00-11-22'),
+(2, '300-00-33-00'),
+(3, 'Bob,400-99-55-777');
 #+end_src
 
 **** Collegamento (via where)
+
+     Fatto l'inserimento, adesso vorremmo però poter "ricostruire" la
+     tabella "completa", com'era originariamente in =Agenda=.  Per fare
+     ciò dobbiamo estrarre le due colonne dalle due tabelle *collegando*
+     (facendo una =join= tra) le righe.  Questo si può fare in due modi:
+     usando una =where= o usando una =join= (nel senso di costrutto SQL).
+     I dettagli li vedremo a lezione, qui mi basta poter scrivere un
+     esempio utile per fare pratica con =repl.it=.
+
+     *Nota*: i nomi delle colonne sono univoci all'*interno di una
+     tabella* per cui, quando si usa una sola tabella, non c'è
+     possibilità di equivoco.  Ma quando si hanno più tabelle, si
+     potrebbero avere, in tabelle diverse, più colonne con lo stesso
+     nome.  Qui "per fortuna" il problema non esiste, per cui nella
+     =select= possiamo usare i nomi "direttamente".  La colonna =id= è
+     però presente in entrambe le colonne, per cui dobbiamo usare la
+     notazione più "completa" formata dal nome della tabella più il
+     nome della colonna (come in =Person.id=).
 
 #+name: phone-join-where
 #+header: :dir ./
 #+header: :db phone.db
 #+begin_src sqlite :results output :exports both
-select name, number
-from Person, Phone
-where Person.id = Phone.id_person;
+.header on
+.separator |
+.mode column
+select name, number                 -- nomi della colonne (per "fortuna" univoci)
+from Person, Phone                  -- tabelle da cui prendere i dati
+where Person.id = Phone.id_person;  -- condizione di collegamento tra righe
 #+end_src
 
 #+RESULTS: phone-join-where
-: Linus,123-44-55-666
-: Linus,123-44-00-888
-: Richard,300-00-11-22
-: Richard,300-00-33-00
-: Bob,"Bob,400-99-55-777"
+: name        number
+: ----------  -------------
+: Linus       123-44-55-666
+: Linus       123-44-00-888
+: Richard     300-00-11-22
+: Richard     300-00-33-00
+: Bob         Bob,400-99-55
 
 **** Collegamento (via join)
+
+     Come già detto, il collegamento tra tabelle si può fare anche con
+     un'altra sintassi, per molti versi preferibile, quantomeno
+     perché così si utilizza la =where=  per il suo scopo "vero", ossia
+     limitare il numero di righe interessate dall'operazione che si
+     sta effettuando (=select= o altro).
 
 #+name: phone-join-join
 #+header: :dir ./
 #+header: :db phone.db
 #+begin_src sqlite :results output :exports both
+.header on
+.separator |
+.mode column
 select name, number
-from Person, Phone
-where Person.id = Phone.id_person;
+from Person left join Phone
+on Person.id = Phone.id_person;
 #+end_src
 
 #+RESULTS: phone-join-join
-: Linus,123-44-55-666
-: Linus,123-44-00-888
-: Richard,300-00-11-22
-: Richard,300-00-33-00
-: Bob,"Bob,400-99-55-777"
+: name        number
+: ----------  -------------
+: Linus       123-44-00-888
+: Linus       123-44-55-666
+: Richard     300-00-11-22
+: Richard     300-00-33-00
+: Bob         Bob,400-99-55
 
-**** Collegamento (full join)
+**** Collegamento (full join)                                      :noexport:
 
 #+name: phone-full-join
 #+header: :dir ./
@@ -828,14 +946,6 @@ Bob,300-00-11-22
 Bob,300-00-33-00
 Bob,"Bob,400-99-55-777"
 #+end_example
-
-
-
-
-
-
-
-
 
 * Local Variables                                                  :noexport:
 
