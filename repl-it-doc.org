@@ -631,10 +631,11 @@ select * from Person;
 : 3,Bob,666-B,63
 
     In realtà, la "select con asterisco" è da evitare per vari motivi,
-    primo tra tutti il fatto che si può sapere in anticipo quante
-    saranno le colonne e quali "nomi" avranno.  Ricordarsi che le
+    primo tra tutti il fatto che non si può sapere in anticipo quante
+    saranno le colonne, quali "nomi" avranno e in che ordine saranno
+    (a meno di non controllare la relativa =create=).  Ricordarsi che le
     tabelle di una tabella possono cambiare nel tempo!  È quindi molto
-    più corretto esplicitare sempre la lista delle colonne.
+    meglio esplicitare sempre la lista delle colonne.
 
     *Nota*: per i "nomi" che seguono la /keyword/ =select= si usa spesso il
     termine di "colonna", ma il termine corretto è *descrittore di
@@ -1014,7 +1015,7 @@ on Person.id = Phone.id_person;
 : Richard     300-00-33-00
 : Bob         Bob,400-99-55
 
-**** Collegamento (full join)                                      :noexport:
+**** Collegamento (full join)
 
      Questa sezione è forse un po' troppo tecnica, ma può essere
      interessante per capire come la =join via where= dell'esempio
@@ -1094,9 +1095,6 @@ PK     FK     name        number         PK = FK
 # org-src-preserve-indentation: t
 # org-confirm-babel-evaluate: nil
 # org-src-fontify-natively: t
+# org-export-use-babel: nil
 # tab-always-indent: nil
 # End:
-
-
-# lucama
-# repl.luke.123
