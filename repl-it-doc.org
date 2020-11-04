@@ -147,9 +147,37 @@
                  delle modifiche se queste non sono state "salvate" in
                  un commit!
 
-** TODO git e github
+** git e github
 
-** TODO Cosa offre repl.it
+   [[https://en.wikipedia.org/wiki/Git][git]] è un =rcs= scritto da [[https://en.wikipedia.org/wiki/Linus_Torvalds][Linus Torvalds]] nel 2005 per supportare lo
+   sviluppo del [[https://en.wikipedia.org/wiki/Linux_kernel][kernel Linux]], è un software "free and open-source"
+   ([[https://en.wikipedia.org/wiki/Free_and_open-source_software][FOSS]]) un progetto e ora uno degli =rsc= più utilizzati.  =git= è anche
+   la "base" del servizio on-line [[https://github.com/][github]] che è forse (?) il più grande
+   "repository" (magazzino?) di software al mondo (ospita anche tutto
+   lo sviluppo di Python e di SQLite).
+
+** Cosa offre repl.it
+
+   =repl.it= usa =git= (=github=?) per offrire un servizio di controllo di
+   revisione minimale ma molto semplice da usare, più che sufficiente
+   per i nostri scopi.
+
+   Supponiamo di avere già scritto un po' di codice, ad esempio nel
+   solito =main.py=.  Cliccando il secondo (di sei) pulsante nella parte
+   sinistra della pagina viene mostrato un pulsante con scritto *Create
+   a git repo*.  Cliccando questo nuovo pulsante appare, tra le altre
+   cose, un rettangolo con scritto *Initial commit*, che indica che è
+   stata "salvata" una prima versione del progetto.
+
+   Se adesso modifico il sorgente, lo "spazio" a sinistra cambia e
+   appare un'area di testo con scritto *What did you change* e un
+   pulsante *Commit and push*.  Se inserisco un commento sulle modifiche
+   appena fatte e premo il pulsante viene creato un nuovo *commit* in
+   cui viene salvata la versione corrente.
+
+   Adesso, nella parte sinistra ci sono *due* blocchi, ciascuno con un
+   pulsante *Revert to here* che permette di "ritornare lì" facendo un
+   *check out* di quella specifica versione.
 
 * Python
 ** L'interprete interattivo
