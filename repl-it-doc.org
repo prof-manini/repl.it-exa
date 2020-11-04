@@ -1016,31 +1016,73 @@ on Person.id = Phone.id_person;
 
 **** Collegamento (full join)                                      :noexport:
 
+     Questa sezione è forse un po' troppo tecnica, ma può essere
+     interessante per capire come la =join via where= dell'esempio
+     precedente produce (o possa produrre) il risultato voluto.
+
+     Quando nella =from= di una =select= sono presenti due tabelle, l'SQL
+     produce una riga per ciascuna combinazione (coppia) possibile
+     delle righe delle due tabelle.  Nell'esempio ho tre nomi e cinque
+     numeri e quindi ottengo quindici righe.  Non tutte queste righe
+     però "hanno senso", perché per esempio ci sono anche quelle di
+     =Linus= con il numero di telefono di =Richard= o di =Bob=.  Queste però
+     vengono eliminate dalla =where=, che richiede che in ciascuna riga
+     =Person.id= abbia lo stesso valore di =Phone.id_person= ossia che
+     venga utilizzato il collegamento tra chiave primaria di =Person= e
+     chiave esterna di =Phone=.
+
+     Nell'esempio che segue si vede il risultato della =join= con tutte
+     le righe; l'ultima colonna ha valore =1= se chiave primaria e
+     chiave esterna coincidono ossia se la riga è una di quelle
+     "buone".
+
+     *Nota*: l'ultima colonna non contiene quindi il valore di un *campo*
+     di una delle due tabella, ma, come spesso succede, un valore
+     *calcolato* a partire dai dati delle due tabelle. Questo è il
+     motivo per cui, ad un certo punto, abbiamo parlato di *descrittori*
+     di colonne.
+
+     *Nota*: in questo esempio ho usato l'operatore =as= che permette di
+     assegnare un nome a piacere a una colonna.  Questa operatore è
+     indispensabile quando ci sono più colonne (ovviamente di tabelle
+     diverse) con lo stesso nome, o quando si desidera un nome più
+     espressivo. Si usa molto frequentemente anche per abbreviare,
+     spesso alla sola iniziale, i nomi delle tabelle quando questi
+     compaiono più volte nella stessa =select=.
+
 #+name: phone-full-join
 #+header: :dir ./
 #+header: :db phone.db
 #+begin_src sqlite :results output :exports both
-select name, number
+.header on
+.separator |
+.mode column
+.width 5 5
+select Person.id as PK, Phone.id_person as FK,
+       name, number,
+       Person.id = Phone.id_person as "PK = FK"
 from Person, Phone;
 #+end_src
 
 #+RESULTS: phone-full-join
 #+begin_example
-Linus,123-44-00-888
-Linus,123-44-55-666
-Linus,300-00-11-22
-Linus,300-00-33-00
-Linus,"Bob,400-99-55-777"
-Richard,123-44-00-888
-Richard,123-44-55-666
-Richard,300-00-11-22
-Richard,300-00-33-00
-Richard,"Bob,400-99-55-777"
-Bob,123-44-00-888
-Bob,123-44-55-666
-Bob,300-00-11-22
-Bob,300-00-33-00
-Bob,"Bob,400-99-55-777"
+PK     FK     name        number         PK = FK
+-----  -----  ----------  -------------  ----------
+1      1      Linus       123-44-55-666  1
+1      1      Linus       123-44-00-888  1
+1      2      Linus       300-00-11-22   0
+1      2      Linus       300-00-33-00   0
+1      3      Linus       Bob,400-99-55  0
+2      1      Richard     123-44-55-666  0
+2      1      Richard     123-44-00-888  0
+2      2      Richard     300-00-11-22   1
+2      2      Richard     300-00-33-00   1
+2      3      Richard     Bob,400-99-55  0
+3      1      Bob         123-44-55-666  0
+3      1      Bob         123-44-00-888  0
+3      2      Bob         300-00-11-22   0
+3      2      Bob         300-00-33-00   0
+3      3      Bob         Bob,400-99-55  1
 #+end_example
 
 * Local Variables                                                  :noexport:
