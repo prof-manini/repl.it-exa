@@ -83,6 +83,74 @@
    sia per poter utilizzare il sistema di controllo di revisione (vedi
    oltre).
 
+* Version control
+
+  Uno strumento indispensabile nello sviluppo software (e non solo) è
+  un *sistema di controllo di revisione* (o di *versione*), di solito
+  abbreviato in =rcs= (*revision control system*)= o =vcs= (*version ...*).
+
+  Gli *rcs* sono sistemi decisamente *complessi* che agevolano il lavoro
+  "individuale", permettono di collaborare con altre persone, e
+  offrono anche un sistema di rete che permette di accedere al codice
+  anche "in remoto". Fortunatamente si rivelano utili anche se si
+  conoscono solo i concetti di base e si utilizzano solo alcune
+  funzionalità.
+
+  La situazione in cui ci poniamo è la seguente:
+
+  1. abbiamo un progetto, ossia un lavoro in corso che produce un
+     qualche risultato (spesso chiamato *deliverable*), ad esempio un
+     software di qualche tipo: un esercizio di Python o di SQL,
+
+  2. abbiamo una *working directory* (cartella di lavoro) che contiene
+     *tutti* i file che vogliamo gestire: codice sorgente, dati di
+     esempio, documentazione, il *prodotto finale* etc;
+
+  3. il progetto si sviluppa e cambia nel tempo e lo stesso succede al
+     contenuto della /working directory/ in quanto, usando vari
+     strumenti (editor di testo e quant'altro) abbiamo creato,
+     modifichiamo, rinominato, cancellato cartelle e file,
+
+  4. ogni volta che cambiamo qualcosa la "situazione precedente" viene
+     dimenticata; quando salvo un file il nuovo contenuto *sostituisce*
+     quello precedente,
+
+  5. morale: non mantengo uno *storico* del mio progetto e mi troverò
+     sempre a dire "ma prima funzionava".
+
+  Per questi ed altri motivi serve un sistema che mi permetta si
+  salvare delle *istantanee* (degli "*screenhsot*") della mia /working
+  directory/ e di poter "tornare indietro nel tempo" recuperando un
+  qualsiasi stato precedente.
+
+** Vocabolario minimo
+
+   - working directory :: come già detto quando si lavora "in locale"
+        (sul proprio computer) la working directory è una cartella
+        come tutte le altre, in =repl.it= è il =repl= che abbiamo creato a
+        inizio sessione e che dal quale possiamo poi ripartire,
+
+   - commit :: usato come verbo (/to commit/) è l'azione di "salvare" lo
+               stato attuale della /working directory/ nel /repository/,
+               usato come sostantivo indica ciascun singolo
+               salvataggio,
+
+   - repository :: è il "contenitore" in cui l'=rcs= salva le varie
+                   istantanee più un sacco di altre informazione
+                   (metadati) su tutto quello che succede (un =rcs= non
+                   dimentica e non cancella mai nulla!).
+
+   - checkout :: è l'azione di "estrarre" una delle versioni
+                 precedentemente salvate nel /repository/; da fare con
+                 attenzione perché modifica il contenuto della
+                 /working directory/ e quindi si rischia di perdere
+                 delle modifiche se queste non sono state "salvate" in
+                 un commit!
+
+** TODO git e github
+
+** TODO Cosa offre repl.it
+
 * Python
 ** L'interprete interattivo
 
